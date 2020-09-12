@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Oversecured Vulnerable Android App</string>
+    <string name="login_url">http://example.com./</string>
+</resources>

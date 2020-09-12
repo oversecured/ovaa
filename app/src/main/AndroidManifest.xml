@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="oversecured.ovaa">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application android:name=".OversecuredApplication" android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/AppTheme">
+        <activity android:name=".activities.DeeplinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="ovaa" android:scheme="oversecured" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.WebViewActivity" android:exported="false">
+            <intent-filter>
+                <action android:name="oversecured.ovaa.action.WEBVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.LoginActivity">
+            <intent-filter>
+                <action android:name="oversecured.ovaa.action.LOGIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.EntranceActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.MainActivity">
+            <intent-filter>
+                <action android:name="oversecured.ovaa.action.ACTIVITY_MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <receiver android:name=".receivers.UselessReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="oversecured.ovaa.action.UNPROTECTED_CREDENTIALS_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".services.InsecureLoggerService">
+            <intent-filter>
+                <action android:name="oversecured.ovaa.action.DUMP" />
+            </intent-filter>
+        </service>
+        <provider android:name=".providers.TheftOverwriteProvider" android:authorities="oversecured.ovaa.theftoverwrite" android:exported="true" />
+        <provider android:name=".providers.CredentialsProvider" android:authorities="oversecured.ovaa.creds_provider" android:exported="false" android:grantUriPermissions="true" />
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="oversecured.ovaa.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+</manifest>
