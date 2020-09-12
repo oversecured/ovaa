@@ -20,6 +20,7 @@ This section only includes the list of vulnerabilities, without a detailed descr
 14. Use of the hardcoded AES key in `WeakCrypto`.
 15. Arbitrary Code Execution in `OversecuredApplication` by launching code from third-party apps with no security checks.
 16. Use of very wide file sharing declaration for `oversecured.ovaa.fileprovider` content provider in `root` entry.
+17. Hardcoded credentials to a dev environment endpoint in `strings.xml` in `test_url` entry.
 
 ---------------------------------------
 *Licensed under the Simplified BSD License*
