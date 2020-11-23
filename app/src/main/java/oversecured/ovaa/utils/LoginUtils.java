@@ -19,6 +19,7 @@ public class LoginUtils {
     private SharedPreferences.Editor editor;
 
     private LoginUtils(Context context) {
+        this.context = context;
         preferences = context.getSharedPreferences("login_data", Context.MODE_PRIVATE);
         editor = preferences.edit();
     }

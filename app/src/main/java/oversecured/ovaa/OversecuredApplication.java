@@ -3,7 +3,10 @@ package oversecured.ovaa;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import java.io.File;
 
 public class OversecuredApplication extends Application {
     @Override
@@ -13,7 +16,7 @@ public class OversecuredApplication extends Application {
     }
 
     private void invokePlugins() {
-        for(PackageInfo info : getPackageManager().getInstalledPackages(0)) {
+        for(PackageInfo info : getPackageManager().getInstalledPackages(PackageManager.GET_META_DATA)) {
             String packageName = info.packageName;
             Bundle meta = info.applicationInfo.metaData;
             if(packageName.startsWith("oversecured.plugin.")
