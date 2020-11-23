@@ -21,6 +21,7 @@ This section only includes the list of vulnerabilities, without a detailed descr
 15. Arbitrary Code Execution in `OversecuredApplication` by launching code from third-party apps with no security checks.
 16. Use of very wide file sharing declaration for `oversecured.ovaa.fileprovider` content provider in `root` entry.
 17. Hardcoded credentials to a dev environment endpoint in `strings.xml` in `test_url` entry.
+18. Arbitrary code execution via a DEX library located in a world-readable/writable directory.
 
 ---------------------------------------
 *Licensed under the Simplified BSD License*
