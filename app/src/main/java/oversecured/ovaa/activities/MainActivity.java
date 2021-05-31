@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent("oversecured.ovaa.action.UNPROTECTED_CREDENTIALS_DATA");
-                i.putExtra("payload", MainActivity.this.loginUtils.getLoginData());
+                i.putExtra("payload", MainActivity.this.loginUtils.getLoginData().toString());
                 sendBroadcast(i);
             }
         });
