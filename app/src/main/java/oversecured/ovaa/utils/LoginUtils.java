@@ -8,9 +8,9 @@ import oversecured.ovaa.R;
 import oversecured.ovaa.objects.LoginData;
 
 public class LoginUtils {
-    private static final String EMAIL_KEY = "email";
-    private static final String PASSWORD_KEY = "password";
-    private static final String LOGIN_URL_KEY = "login_url";
+    private static final String EMAIL_KEY;
+    private static final String PASSWORD_KEY;
+    private static final String LOGIN_URL_KEY;
 
     private static LoginUtils utils;
 
