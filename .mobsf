@@ -1,9 +1,0 @@
----
-- ignore-filenames:
-  - .gitignore
-  - .mobsf
-
-  ignore-paths:
-  - .github
-  - .idea
-  
