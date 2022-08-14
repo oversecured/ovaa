@@ -68,6 +68,7 @@ public class DeeplinkActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == -1 && requestCode == URI_GRANT_CODE) {
             setResult(resultCode, data);
+            finish();
         }
     }
 }
