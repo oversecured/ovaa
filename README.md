@@ -26,6 +26,6 @@ This section only includes the list of vulnerabilities, without a detailed descr
 ---------------------------------------
 *Licensed under the Simplified BSD License*
 
-*Copyright (c) 2022, Oversecured Inc*
+*Copyright (c) 2023, Oversecured Inc*
 
 https://oversecured.com/
