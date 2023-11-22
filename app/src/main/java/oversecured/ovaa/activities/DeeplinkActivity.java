@@ -20,16 +20,19 @@ public class DeeplinkActivity extends AppCompatActivity {
         loginUtils = LoginUtils.getInstance(this);
         Intent intent = getIntent();
         Uri uri;
-        if(intent != null
+        boolean waitForActivityResult = false;
+        if (intent != null
                 && Intent.ACTION_VIEW.equals(intent.getAction())
                 && (uri = intent.getData()) != null) {
 
-            processDeeplink(uri);
+            waitForActivityResult = processDeeplink(uri);
         }
-        finish();
+        if (!waitForActivityResult) {
+            finish();
+        }
     }
 
-    private void processDeeplink(Uri uri) {
+    private boolean processDeeplink(Uri uri) {
         if("oversecured".equals(uri.getScheme()) && "ovaa".equals(uri.getHost())) {
             String path = uri.getPath();
             if("/logout".equals(path)) {
@@ -47,6 +50,7 @@ public class DeeplinkActivity extends AppCompatActivity {
                 Intent i = new Intent("oversecured.ovaa.action.GRANT_PERMISSIONS");
                 if(getPackageManager().resolveActivity(i, 0) != null) {
                     startActivityForResult(i, URI_GRANT_CODE);
+                    return true;
                 }
             }
             else if("/webview".equals(path)) {
@@ -61,13 +65,17 @@ public class DeeplinkActivity extends AppCompatActivity {
                 }
             }
         }
+        return false;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == -1 && requestCode == URI_GRANT_CODE) {
-            setResult(resultCode, data);
+        if (requestCode == URI_GRANT_CODE) {
+            if (resultCode == -1) {
+                setResult(resultCode, data);
+                finish();
+            }
         }
     }
 }
