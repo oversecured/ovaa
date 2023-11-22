@@ -1,21 +1,29 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 28
+    namespace 'oversecured.ovaa'
+    compileSdk 30
 
     defaultConfig {
         applicationId "oversecured.ovaa"
-        minSdkVersion 17
-        targetSdkVersion 28
+        minSdk 24
+        targetSdk 30
         versionCode 1
         versionName "1.0"
     }
+    
     externalNativeBuild {
         cmake {
             path file('CMakeLists.txt')
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
