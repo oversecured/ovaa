@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         loginUtils = LoginUtils.getInstance(this);
-        if(loginUtils.isLoggedIn()) {
+        if (loginUtils.isLoggedIn()) {
             onLoginFinished();
             return;
         }
@@ -41,15 +41,14 @@ public class LoginActivity extends AppCompatActivity {
                 String email = ((TextView) findViewById(R.id.emailView)).getText().toString();
                 String password = ((TextView) findViewById(R.id.passwordView)).getText().toString();
 
-                if(TextUtils.isEmpty(email)) {
+                if (TextUtils.isEmpty(email)) {
                     Toast.makeText(LoginActivity.this, "Email is emply!", Toast.LENGTH_LONG).show();
                     return;
                 }
-                if(TextUtils.isEmpty(password)) {
+                if (TextUtils.isEmpty(password)) {
                     Toast.makeText(LoginActivity.this, "Password is emply!", Toast.LENGTH_LONG).show();
                     return;
                 }
-
                 processLogin(email, password);
             }
         });
@@ -76,10 +75,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void onLoginFinished() {
         Intent redirectIntent = getIntent().getParcelableExtra(INTENT_REDIRECT_KEY);
-        if(redirectIntent != null) {
+        if (redirectIntent != null) {
             startActivity(redirectIntent);
-        }
-        else {
+        } else {
             startActivity(new Intent(this, MainActivity.class));
         }
         finish();

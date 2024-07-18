@@ -25,7 +25,7 @@ public class LoginUtils {
     }
 
     public static LoginUtils getInstance(Context context) {
-        if(utils == null) {
+        if (utils == null) {
             utils = new LoginUtils(context);
         }
         return utils;
@@ -52,7 +52,7 @@ public class LoginUtils {
 
     public String getLoginUrl() {
         String url = preferences.getString(LOGIN_URL_KEY, null);
-        if(TextUtils.isEmpty(url)) {
+        if (TextUtils.isEmpty(url)) {
             url = context.getString(R.string.login_url);
             editor.putString(LOGIN_URL_KEY, url).commit();
         }

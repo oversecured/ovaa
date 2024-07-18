@@ -32,8 +32,7 @@ public class FileUtils {
             i.close();
             o.close();
             return out;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return null;
         }
     }

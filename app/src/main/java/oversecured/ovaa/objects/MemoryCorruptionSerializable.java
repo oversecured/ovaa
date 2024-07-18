@@ -15,7 +15,7 @@ public class MemoryCorruptionSerializable implements Serializable {
 
     @Override
     protected void finalize() throws Throwable {
-        if(ptr != 0) {
+        if (ptr != 0) {
             freePtr(ptr);
             ptr = 0;
         }

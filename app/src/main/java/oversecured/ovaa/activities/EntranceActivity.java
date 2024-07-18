@@ -13,10 +13,9 @@ public class EntranceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(LoginUtils.getInstance(this).isLoggedIn()) {
+        if (LoginUtils.getInstance(this).isLoggedIn()) {
             startActivity(new Intent("oversecured.ovaa.action.ACTIVITY_MAIN"));
-        }
-        else {
+        } else {
             startActivity(new Intent("oversecured.ovaa.action.LOGIN"));
         }
         finish();

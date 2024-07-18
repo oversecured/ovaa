@@ -27,10 +27,9 @@ public class InsecureLoggerService extends IntentService {
 
     private File getDumpFile(Intent intent) {
         Object file = intent.getExtras().get(EXTRA_FILE);
-        if(file instanceof String) {
+        if (file instanceof String) {
             return new File((String) file);
-        }
-        else if(file instanceof File) {
+        } else if(file instanceof File) {
             return (File) file;
         }
         throw new IllegalArgumentException();

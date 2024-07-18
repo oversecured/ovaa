@@ -17,8 +17,7 @@ public class WeakCrypto {
             Cipher instance = Cipher.getInstance("AES");
             instance.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             return Base64.encodeToString(instance.doFinal(data.getBytes()), 0);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return "";
         }
     }

@@ -23,7 +23,7 @@ public class OversecuredApplication extends Application {
     }
 
     private void invokePlugins() {
-        for(PackageInfo info : getPackageManager().getInstalledPackages(PackageManager.GET_META_DATA)) {
+        for (PackageInfo info : getPackageManager().getInstalledPackages(PackageManager.GET_META_DATA)) {
             String packageName = info.packageName;
             Bundle meta = info.applicationInfo.metaData;
             if(packageName.startsWith("oversecured.plugin.")
@@ -36,8 +36,7 @@ public class OversecuredApplication extends Application {
                             .loadClass("oversecured.plugin.Loader")
                             .getMethod("loadMetadata", Context.class)
                             .invoke(null, this);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }

@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class MemoryCorruptionParcelable implements Parcelable {
-    public static final Parcelable.Creator<MemoryCorruptionParcelable> CREATOR = new Parcelable.Creator<MemoryCorruptionParcelable>() {
+    public static final Parcelable.Creator<MemoryCorruptionParcelable> CREATOR = new Parcelable.Creator<>() {
         @Override
         public MemoryCorruptionParcelable[] newArray(int i) {
             return new MemoryCorruptionParcelable[i];
@@ -27,8 +27,7 @@ public class MemoryCorruptionParcelable implements Parcelable {
         try {
             Class clazz = Class.forName(parcel.readString());
             data = GSON.fromJson(parcel.readString(), clazz);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

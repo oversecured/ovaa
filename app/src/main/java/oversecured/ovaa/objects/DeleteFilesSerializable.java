@@ -10,7 +10,7 @@ import oversecured.ovaa.utils.FileUtils;
 public class DeleteFilesSerializable implements Serializable {
     private void readObject(ObjectInputStream in) throws IOException {
         File file = new File(in.readUTF());
-        if(file.exists()) {
+        if (file.exists()) {
             FileUtils.deleteRecursive(file);
         }
     }
