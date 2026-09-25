@@ -1,0 +1,81 @@
+name: Build APK
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build debug & release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: >-
+          sdkmanager
+          "platforms;android-37"
+          "build-tools;36.0.0"
+          "ndk;28.2.13676358"
+          "cmake;3.22.1"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APKs
+        run: ./gradlew assembleDebug assembleRelease --no-daemon
+
+      - name: Verify APK outputs
+        run: |
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          ls -lh app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ovaa-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload release APK (unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ovaa-release-apk-unsigned
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
+
+  release:
+    name: Publish APKs to GitHub Releases
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: apks
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apks/ovaa-debug-apk/app-debug.apk
+            apks/ovaa-release-apk-unsigned/app-release-unsigned.apk
+          generate_release_notes: true
