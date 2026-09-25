@@ -1,15 +1,18 @@
 package oversecured.ovaa.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.IntentCompat;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
+
+import java.util.Objects;
 
 import oversecured.ovaa.R;
 import oversecured.ovaa.network.LoginService;
@@ -36,22 +39,19 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        findViewById(R.id.loginButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = ((TextView) findViewById(R.id.emailView)).getText().toString();
-                String password = ((TextView) findViewById(R.id.passwordView)).getText().toString();
+        findViewById(R.id.loginButton).setOnClickListener(view -> {
+            String email = ((TextView) findViewById(R.id.emailView)).getText().toString();
+            String password = ((TextView) findViewById(R.id.passwordView)).getText().toString();
 
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(LoginActivity.this, "Email is emply!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "Password is emply!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                processLogin(email, password);
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(LoginActivity.this, "Email is emply!", Toast.LENGTH_LONG).show();
+                return;
             }
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(LoginActivity.this, "Password is emply!", Toast.LENGTH_LONG).show();
+                return;
+            }
+            processLogin(email, password);
         });
     }
 
@@ -60,13 +60,13 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("ovaa", "Processing " + loginData);
 
         LoginService loginService = RetrofitInstance.getInstance().create(LoginService.class);
-        loginService.login(loginUtils.getLoginUrl(), loginData).enqueue(new Callback<Void>() {
+        loginService.login(loginUtils.getLoginUrl(), loginData).enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
             }
         });
 
@@ -75,13 +75,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void onLoginFinished() {
-        Intent redirectIntent = IntentCompat.getParcelableExtra(
-                getIntent(), INTENT_REDIRECT_KEY, Intent.class);
-        if (redirectIntent != null) {
-            startActivity(redirectIntent);
-        } else {
-            startActivity(new Intent(this, MainActivity.class));
-        }
+        @SuppressLint("UnsafeIntentLaunch") Intent redirectIntent = IntentCompat.getParcelableExtra(getIntent(), INTENT_REDIRECT_KEY, Intent.class);
+        startActivity(Objects.requireNonNullElseGet(redirectIntent, () -> new Intent(this, MainActivity.class)));
         finish();
     }
 }
