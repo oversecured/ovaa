@@ -1,6 +1,7 @@
 package oversecured.ovaa.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -74,7 +75,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void onLoginFinished() {
-        Intent redirectIntent = getIntent().getParcelableExtra(INTENT_REDIRECT_KEY);
+        Intent redirectIntent = IntentCompat.getParcelableExtra(
+                getIntent(), INTENT_REDIRECT_KEY, Intent.class);
         if (redirectIntent != null) {
             startActivity(redirectIntent);
         } else {
