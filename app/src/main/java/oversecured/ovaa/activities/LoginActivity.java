@@ -44,11 +44,11 @@ public class LoginActivity extends AppCompatActivity {
             String password = ((TextView) findViewById(R.id.passwordView)).getText().toString();
 
             if (TextUtils.isEmpty(email)) {
-                Toast.makeText(LoginActivity.this, "Email is emply!", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Email is empty!", Toast.LENGTH_LONG).show();
                 return;
             }
             if (TextUtils.isEmpty(password)) {
-                Toast.makeText(LoginActivity.this, "Password is emply!", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Password is empty!", Toast.LENGTH_LONG).show();
                 return;
             }
             processLogin(email, password);
