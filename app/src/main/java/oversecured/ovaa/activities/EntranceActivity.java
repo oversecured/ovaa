@@ -1,9 +1,9 @@
 package oversecured.ovaa.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import oversecured.ovaa.utils.LoginUtils;
 
