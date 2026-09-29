@@ -34,7 +34,7 @@ public class InsecureLoggerService extends IntentService {
         Object file = extras == null ? null : extras.get(EXTRA_FILE);
         if (file instanceof String) {
             return new File((String) file);
-        } else if(file instanceof File) {
+        } else if (file instanceof File) {
             return (File) file;
         }
         return null;

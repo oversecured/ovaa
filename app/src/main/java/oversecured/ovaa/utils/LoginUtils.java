@@ -14,9 +14,9 @@ public class LoginUtils {
 
     private static LoginUtils utils;
 
-    private Context context;
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
+    private final Context context;
+    private final SharedPreferences preferences;
+    private final SharedPreferences.Editor editor;
 
     private LoginUtils(Context context) {
         this.context = context;
@@ -36,18 +36,11 @@ public class LoginUtils {
     }
 
     public void saveCredentials(LoginData loginData) {
-        editor.putString(EMAIL_KEY, loginData.email)
-                .putString(PASSWORD_KEY, loginData.password)
-                .commit();
+        editor.putString(EMAIL_KEY, loginData.email).putString(PASSWORD_KEY, loginData.password).commit();
     }
 
     public LoginData getLoginData() {
-        return new LoginData(preferences.getString(EMAIL_KEY, null),
-                preferences.getString(PASSWORD_KEY, null));
-    }
-
-    public void setLoginUrl(String url) {
-        editor.putString(LOGIN_URL_KEY, url).commit();
+        return new LoginData(preferences.getString(EMAIL_KEY, null), preferences.getString(PASSWORD_KEY, null));
     }
 
     public String getLoginUrl() {
@@ -57,6 +50,10 @@ public class LoginUtils {
             editor.putString(LOGIN_URL_KEY, url).commit();
         }
         return url;
+    }
+
+    public void setLoginUrl(String url) {
+        editor.putString(LOGIN_URL_KEY, url).commit();
     }
 
     public void logout() {

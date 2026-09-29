@@ -1,11 +1,11 @@
 package oversecured.ovaa.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import oversecured.ovaa.utils.LoginUtils;
 
@@ -32,18 +32,18 @@ public class DeeplinkActivity extends AppCompatActivity {
             if ("/logout".equals(path)) {
                 loginUtils.logout();
                 startActivity(new Intent(this, EntranceActivity.class));
-            } else if("/login".equals(path)) {
+            } else if ("/login".equals(path)) {
                 String url = uri.getQueryParameter("url");
                 if (url != null) {
                     loginUtils.setLoginUrl(url);
                 }
                 startActivity(new Intent(this, EntranceActivity.class));
-            } else if("/grant_uri_permissions".equals(path)) {
+            } else if ("/grant_uri_permissions".equals(path)) {
                 Intent i = new Intent("oversecured.ovaa.action.GRANT_PERMISSIONS");
-                if(getPackageManager().resolveActivity(i, 0) != null) {
+                if (getPackageManager().resolveActivity(i, 0) != null) {
                     startActivityForResult(i, URI_GRANT_CODE);
                 }
-            } else if("/webview".equals(path)) {
+            } else if ("/webview".equals(path)) {
                 String url = uri.getQueryParameter("url");
                 if (url != null) {
                     String host = Uri.parse(url).getHost();
