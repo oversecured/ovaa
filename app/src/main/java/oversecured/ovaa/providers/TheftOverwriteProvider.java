@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
@@ -45,7 +44,7 @@ public class TheftOverwriteProvider extends ContentProvider {
 
     @Override
     public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode) throws FileNotFoundException {
-        File file = new File(Environment.getExternalStorageDirectory(), uri.getLastPathSegment());
+        File file = new File(getContext().getFilesDir(), uri.getLastPathSegment());
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE);
     }
 }

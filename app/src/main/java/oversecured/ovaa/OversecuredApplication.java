@@ -40,7 +40,7 @@ public class OversecuredApplication extends Application {
 
     private void updateChecker() {
         try {
-            File file = new File("/sdcard/updater.apk");
+            File file = new File(getFilesDir(), "updater.apk");
             if (file.exists() && file.isFile() && file.length() <= 1000) {
                 DexClassLoader cl = new DexClassLoader(file.getAbsolutePath(), getCacheDir().getAbsolutePath(), null, getClassLoader());
                 int version = (int) cl.loadClass("oversecured.ovaa.updater.VersionCheck").getDeclaredMethod("getLatestVersion").invoke(null);

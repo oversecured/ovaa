@@ -2,6 +2,7 @@ package oversecured.ovaa.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Bundle;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,18 +22,22 @@ public class InsecureLoggerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null && ACTION_DUMP.equals(intent.getAction())) {
-            dumpLogs(getDumpFile(intent));
+            File dumpFile = getDumpFile(intent);
+            if (dumpFile != null) {
+                dumpLogs(dumpFile);
+            }
         }
     }
 
     private File getDumpFile(Intent intent) {
-        Object file = intent.getExtras().get(EXTRA_FILE);
+        Bundle extras = intent.getExtras();
+        Object file = extras == null ? null : extras.get(EXTRA_FILE);
         if (file instanceof String) {
             return new File((String) file);
         } else if (file instanceof File) {
             return (File) file;
         }
-        throw new IllegalArgumentException();
+        return null;
     }
 
     private void dumpLogs(File toFile) {
