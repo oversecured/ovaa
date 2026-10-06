@@ -16,6 +16,11 @@ android {
             path = file('CMakeLists.txt')
         }
     }
+    buildFeatures {
+        // ICredentialsService.aidl; off by default, and the gradle.properties flag that used to turn
+        // it on was removed in AGP 9
+        aidl = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

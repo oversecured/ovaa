@@ -23,9 +23,9 @@ public class FileUtils {
         file.delete();
     }
 
-    public static File copyToCache(Context context, Uri uri) {
+    public static File copyToPublicProvider(Context context, Uri uri) {
         try {
-            File out = new File(context.getExternalCacheDir(), "" + System.currentTimeMillis());
+            File out = new File(context.getFilesDir(), "picked.bin");
             InputStream i = context.getContentResolver().openInputStream(uri);
             OutputStream o = new FileOutputStream(out);
             IOUtils.copy(i, o);

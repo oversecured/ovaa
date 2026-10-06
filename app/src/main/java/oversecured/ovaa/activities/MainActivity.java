@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == -1 && data != null) {
             if (requestCode == PICK_CODE) {
-                FileUtils.copyToCache(this, data.getData());
+                FileUtils.copyToPublicProvider(this, data.getData());
             }
         }
     }
