@@ -17,23 +17,48 @@ public class FileAccessActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String path = intent.getStringExtra("path");
         String outputPath = intent.getStringExtra("output_path");
         String name = intent.getStringExtra("name");
         String data = intent.getStringExtra("data");
 
-        copyToControlledDirectory(path, outputPath);
-        overwriteControlledPath(outputPath, data);
-        corruptFile(outputPath);
-        deleteArbitraryFile(path);
-        makeWorldReadable(path);
-        makeWorldWritable(path);
-        makeWorldReadableAndWritable(path);
-        buildPathFromInput(name);
+        switch (action) {
+            case "export":
+                saveToDirectory(path, outputPath);
+                break;
+            case "write":
+                writeToPath(outputPath, data);
+                break;
+            case "pad":
+                appendPadding(outputPath);
+                break;
+            case "delete":
+                removeFile(path);
+                break;
+            case "share_readable":
+                shareReadable(path);
+                break;
+            case "share_writable":
+                shareWritable(path);
+                break;
+            case "share_read_write":
+                shareReadWrite(path);
+                break;
+            case "open_profile":
+                openProfile(name);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
-    private void copyToControlledDirectory(String path, String outputPath) {
+    private void saveToDirectory(String path, String outputPath) {
         if (path == null || outputPath == null) {
             return;
         }
@@ -44,7 +69,7 @@ public class FileAccessActivity extends Activity {
         }
     }
 
-    private void overwriteControlledPath(String outputPath, String data) {
+    private void writeToPath(String outputPath, String data) {
         if (outputPath == null || data == null) {
             return;
         }
@@ -54,7 +79,7 @@ public class FileAccessActivity extends Activity {
         }
     }
 
-    private void corruptFile(String outputPath) {
+    private void appendPadding(String outputPath) {
         if (outputPath == null) {
             return;
         }
@@ -64,7 +89,7 @@ public class FileAccessActivity extends Activity {
         }
     }
 
-    private void deleteArbitraryFile(String path) {
+    private void removeFile(String path) {
         if (path == null) {
             return;
         }
@@ -72,21 +97,21 @@ public class FileAccessActivity extends Activity {
         FileUtils.deleteQuietly(new File(getFilesDir(), path));
     }
 
-    private void makeWorldReadable(String path) {
+    private void shareReadable(String path) {
         if (path == null) {
             return;
         }
         new File(path).setReadable(true, false);
     }
 
-    private void makeWorldWritable(String path) {
+    private void shareWritable(String path) {
         if (path == null) {
             return;
         }
         new File(path).setWritable(true, false);
     }
 
-    private void makeWorldReadableAndWritable(String path) {
+    private void shareReadWrite(String path) {
         if (path == null) {
             return;
         }
@@ -95,7 +120,7 @@ public class FileAccessActivity extends Activity {
         file.setWritable(true, false);
     }
 
-    private void buildPathFromInput(String name) {
+    private void openProfile(String name) {
         if (name == null) {
             return;
         }

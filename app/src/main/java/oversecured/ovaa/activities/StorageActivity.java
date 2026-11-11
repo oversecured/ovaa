@@ -3,28 +3,45 @@ package oversecured.ovaa.activities;
 import android.content.Intent;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import java.io.File;
+import java.util.Map;
+
+import oversecured.ovaa.objects.LoginData;
+import oversecured.ovaa.utils.LoginUtils;
 
 public class StorageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String name = intent.getStringExtra("name");
         String value = intent.getStringExtra("value");
 
-        sqlInjection(name);
-        insertAttackerData(name, value);
-        storePassword(value);
-        writeArbitraryPreferences(name, value);
-        readArbitraryPreferences(name);
-        worldAccessiblePreferences();
+        switch (action) {
+            case "search":
+                searchProfiles(name);
+                break;
+            case "save":
+                saveProfile(name, value);
+                break;
+            case "sync":
+                syncAccount(intent);
+                break;
+            case "export_prefs":
+                returnPreferences(intent);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
@@ -32,7 +49,7 @@ public class StorageActivity extends Activity {
         return openOrCreateDatabase("ovaa.db", MODE_PRIVATE, null);
     }
 
-    private void sqlInjection(String name) {
+    private void searchProfiles(String name) {
         if (name == null) {
             return;
         }
@@ -44,7 +61,7 @@ public class StorageActivity extends Activity {
         db.query("profiles", null, "name = '" + name + "'", null, null, null, null).close();
     }
 
-    private void insertAttackerData(String name, String value) {
+    private void saveProfile(String name, String value) {
         if (name == null || value == null) {
             return;
         }
@@ -54,33 +71,25 @@ public class StorageActivity extends Activity {
         database().insert("profiles", null, values);
     }
 
-    private void storePassword(String value) {
-        getSharedPreferences("secrets", MODE_PRIVATE)
-                .edit()
-                .putString("password", value)
-                .putString("pin", "1234")
-                .commit();
-    }
-
-    private void writeArbitraryPreferences(String name, String value) {
-        if (name == null || value == null) {
+    private void syncAccount(Intent intent) {
+        String email = intent.getStringExtra("email");
+        String password = intent.getStringExtra("password");
+        if (email == null || password == null) {
             return;
         }
-        SharedPreferences preferences = getSharedPreferences(name, MODE_PRIVATE);
-        preferences.edit().putString(name, value).commit();
+        LoginUtils.getInstance(this).saveCredentials(new LoginData(email, password));
     }
 
-    private void readArbitraryPreferences(String name) {
-        if (name == null) {
+    private void returnPreferences(Intent intent) {
+        String prefsName = intent.getStringExtra("prefs");
+        if (prefsName == null) {
             return;
         }
-        getSharedPreferences(name, MODE_PRIVATE).getAll();
-    }
-
-    @SuppressWarnings("deprecation")
-    private void worldAccessiblePreferences() {
-        getSharedPreferences("shared_state", Context.MODE_WORLD_READABLE);
-        getSharedPreferences("shared_state", Context.MODE_WORLD_WRITEABLE);
-        new File(getFilesDir(), "shared_state.xml").setReadable(true, false);
+        SharedPreferences preferences = getSharedPreferences(prefsName, MODE_PRIVATE);
+        Intent result = new Intent();
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            result.putExtra(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+        setResult(RESULT_OK, result);
     }
 }

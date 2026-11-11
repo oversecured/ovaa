@@ -11,12 +11,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class InsecureLoggerService extends IntentService {
-    private static final String ACTION_DUMP = "oversecured.ovaa.action.DUMP";
+public class DiagnosticsService extends IntentService {
+    private static final String ACTION_DUMP = "oversecured.ovaa.action.DIAGNOSTICS";
     private static final String EXTRA_FILE = "oversecured.ovaa.extra.file";
 
-    public InsecureLoggerService() {
-        super("InsecureLoggerService");
+    public DiagnosticsService() {
+        super("DiagnosticsService");
     }
 
     @Override
@@ -41,22 +41,21 @@ public class InsecureLoggerService extends IntentService {
     }
 
     private void dumpLogs(File toFile) {
+        Process logcatProcess = null;
         try {
-            Process logcatProcess = Runtime.getRuntime().exec("logcat -d");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(logcatProcess.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(toFile));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
+            logcatProcess = Runtime.getRuntime().exec("logcat -d");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(logcatProcess.getInputStream()));
+                 BufferedWriter writer = new BufferedWriter(new FileWriter(toFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    writer.append(line).append('\n');
                 }
-                writer.append(line).append('\n');
             }
-            writer.flush();
-            writer.close();
-            reader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
+        } finally {
+            if (logcatProcess != null) {
+                logcatProcess.destroy();
+            }
         }
     }
 }

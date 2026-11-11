@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 
 import oversecured.ovaa.utils.LoginUtils;
 
-public class LeakyProvider extends ContentProvider {
+public class SharedFilesProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         return true;

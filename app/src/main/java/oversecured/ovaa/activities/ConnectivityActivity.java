@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.UUID;
 
 import oversecured.ovaa.utils.LoginUtils;
@@ -33,6 +34,11 @@ public class ConnectivityActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String path = intent.getStringExtra("path");
         String payload = intent.getStringExtra("payload");
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -43,10 +49,22 @@ public class ConnectivityActivity extends Activity {
         boolean cancelAll = intent.getBooleanExtra("cancel_all", false);
         String secret = LoginUtils.getInstance(this).getLoginData().password;
 
-        sendOverBluetooth(path, payload, secret);
-        sendOverNfc(tag, path, payload, secret);
-        postNotification(title, text, notificationId);
-        hideNotifications(cancelId, cancelAll);
+        switch (action) {
+            case "bluetooth_share":
+                sendOverBluetooth(path, payload, secret);
+                break;
+            case "nfc_share":
+                sendOverNfc(tag, path, payload, secret);
+                break;
+            case "notify":
+                postNotification(title, text, notificationId);
+                break;
+            case "dismiss":
+                hideNotifications(cancelId, cancelAll);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
@@ -65,7 +83,14 @@ public class ConnectivityActivity extends Activity {
         if (adapter == null) {
             return;
         }
-        for (BluetoothDevice device : adapter.getBondedDevices()) {
+        Set<BluetoothDevice> bonded;
+        // getBondedDevices needs the BLUETOOTH_CONNECT runtime grant since API 31
+        try {
+            bonded = adapter.getBondedDevices();
+        } catch (SecurityException e) {
+            return;
+        }
+        for (BluetoothDevice device : bonded) {
             try {
                 BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(SERVICE_UUID);
                 socket.connect();

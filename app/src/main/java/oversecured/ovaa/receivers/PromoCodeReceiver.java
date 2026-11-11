@@ -10,13 +10,13 @@ import java.io.Serializable;
 
 import oversecured.ovaa.utils.LoginUtils;
 
-public class VulnReceiver extends BroadcastReceiver {
+public class PromoCodeReceiver extends BroadcastReceiver {
     private static final String TAG = "ovaa";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         deserializeExtras(intent);
-        registerUnprotectedReceiver(context);
+        registerSyncListener(context);
         forwardToService(context, intent);
     }
 
@@ -27,13 +27,14 @@ public class VulnReceiver extends BroadcastReceiver {
         }
     }
 
-    private void registerUnprotectedReceiver(Context context) {
-        context.registerReceiver(new BroadcastReceiver() {
+    private void registerSyncListener(Context context) {
+        // register on the application context; the onReceive context is restricted and rejects registerReceiver
+        context.getApplicationContext().registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context inner, Intent received) {
                 Log.d(TAG, "credentials: " + LoginUtils.getInstance(inner).getLoginData());
             }
-        }, new IntentFilter("oversecured.ovaa.action.INTERNAL_SYNC"));
+        }, new IntentFilter("oversecured.ovaa.action.INTERNAL_SYNC"), Context.RECEIVER_EXPORTED);
     }
 
     private void forwardToService(Context context, Intent intent) {

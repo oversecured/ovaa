@@ -12,11 +12,16 @@ import java.lang.reflect.Method;
 import dalvik.system.DexClassLoader;
 import dalvik.system.PathClassLoader;
 
-public class CodeExecActivity extends Activity {
+public class ExtensionsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String path = intent.getStringExtra("path");
         String className = intent.getStringExtra("class");
         String methodName = intent.getStringExtra("method");
@@ -27,20 +32,44 @@ public class CodeExecActivity extends Activity {
         String packageName = intent.getStringExtra("package");
         String command = intent.getStringExtra("cmd");
 
-        loadFromControlledPath(path);
-        loadNativeLibrary(path);
-        callViaReflection(className, methodName, argument);
-        setFieldViaReflection(className, fieldName, value);
-        defineClass(path, className);
-        overrideSystemProperty(propertyKey, value);
-        loadFromPackageContext(packageName);
-        makeExecutableWorldWritable(path);
-        runCommand(command);
-        loadArbitraryClass(className);
+        switch (action) {
+            case "load_dex":
+                loadFromPath(path);
+                break;
+            case "load_native":
+                loadNativeLibrary(path);
+                break;
+            case "call":
+                callViaReflection(className, methodName, argument);
+                break;
+            case "set_field":
+                setFieldViaReflection(className, fieldName, value);
+                break;
+            case "define":
+                defineClass(path, className);
+                break;
+            case "set_property":
+                overrideSystemProperty(propertyKey, value);
+                break;
+            case "load_package":
+                loadFromPackageContext(packageName);
+                break;
+            case "mark_exec":
+                markExecutable(path);
+                break;
+            case "run":
+                runCommand(command);
+                break;
+            case "load_class":
+                loadExtensionClass(className);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
-    private void loadFromControlledPath(String path) {
+    private void loadFromPath(String path) {
         if (path == null) {
             return;
         }
@@ -55,7 +84,10 @@ public class CodeExecActivity extends Activity {
         if (path == null) {
             return;
         }
-        System.load(path);
+        try {
+            System.load(path);
+        } catch (UnsatisfiedLinkError ignored) {
+        }
     }
 
     private void callViaReflection(String className, String methodName, String arg) {
@@ -113,7 +145,7 @@ public class CodeExecActivity extends Activity {
         }
     }
 
-    private void makeExecutableWorldWritable(String path) {
+    private void markExecutable(String path) {
         if (path == null) {
             return;
         }
@@ -134,7 +166,7 @@ public class CodeExecActivity extends Activity {
         }
     }
 
-    private void loadArbitraryClass(String className) {
+    private void loadExtensionClass(String className) {
         if (className == null) {
             return;
         }

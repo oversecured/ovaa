@@ -2,7 +2,7 @@ package oversecured.ovaa.objects;
 
 import java.io.Serializable;
 
-public class MemoryCorruptionSerializable implements Serializable {
+public class MemoryState implements Serializable {
     private static final long serialVersionUID = 0L;
 
     static {

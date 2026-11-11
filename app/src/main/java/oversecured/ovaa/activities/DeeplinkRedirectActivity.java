@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-
+/**
+ * Opens a link that was shared into the store (ovaa://open?next=...).
+ */
 public class DeeplinkRedirectActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +21,7 @@ public class DeeplinkRedirectActivity extends Activity {
             finish();
             return;
         }
-        redirect(data);
+        open(data);
         finish();
     }
 
@@ -31,7 +33,7 @@ public class DeeplinkRedirectActivity extends Activity {
         return caller.startsWith("oversecured");
     }
 
-    private void redirect(Uri data) {
+    private void open(Uri data) {
         String target = data.getQueryParameter("next");
         if (target == null) {
             return;
@@ -39,7 +41,7 @@ public class DeeplinkRedirectActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(target));
         startActivity(intent);
 
-        Intent webView = new Intent(this, VulnerableWebViewActivity.class);
+        Intent webView = new Intent(this, HelpCenterActivity.class);
         webView.putExtra("url", target);
         startActivity(webView);
     }

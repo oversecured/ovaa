@@ -54,86 +54,86 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <receiver android:name=".receivers.UselessReceiver" android:exported="false">
+        <receiver android:name=".receivers.CartSyncReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.UNPROTECTED_CREDENTIALS_DATA" />
+                <action android:name="oversecured.ovaa.action.CART_SYNC" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        <service android:name=".services.InsecureLoggerService" android:exported="true">
+        <service android:name=".services.DiagnosticsService" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.DUMP" />
+                <action android:name="oversecured.ovaa.action.DIAGNOSTICS" />
             </intent-filter>
         </service>
-        <activity android:name=".activities.CodeExecActivity" android:exported="true">
+        <activity android:name=".activities.ExtensionsActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.CODE_EXEC" />
+                <action android:name="oversecured.ovaa.action.EXTENSIONS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="codeexec" android:scheme="ovaa" />
+                <data android:host="extension" android:scheme="ovaa" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.FileAccessActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.FILE_ACCESS" />
+                <action android:name="oversecured.ovaa.action.DOWNLOADS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ExfiltrationActivity" android:exported="true">
+        <activity android:name=".activities.ShareOrderActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.EXFILTRATE" />
+                <action android:name="oversecured.ovaa.action.SHARE_ORDER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ResultTheftActivity" android:exported="true">
+        <activity android:name=".activities.ReturnPhotoActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.RESULT_THEFT" />
+                <action android:name="oversecured.ovaa.action.RETURN_PHOTO" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MediaTheftActivity" android:exported="true">
+        <activity android:name=".activities.PhotoUploadActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.MEDIA" />
+                <action android:name="oversecured.ovaa.action.UPLOAD_PHOTO" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.VulnerableWebViewActivity" android:exported="true">
+        <activity android:name=".activities.HelpCenterActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.VULN_WEBVIEW" />
+                <action android:name="oversecured.ovaa.action.HELP_CENTER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.IntentVulnActivity" android:exported="true">
+        <activity android:name=".activities.QuickActionActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.INTENT_VULN" />
+                <action android:name="oversecured.ovaa.action.QUICK_ACTION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.InsecureNetworkActivity" android:exported="true">
+        <activity android:name=".activities.StoreApiActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.NETWORK" />
+                <action android:name="oversecured.ovaa.action.STORE_API" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.StorageActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.STORAGE" />
+                <action android:name="oversecured.ovaa.action.ORDER_SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.DeviceControlActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.DEVICE" />
+                <action android:name="oversecured.ovaa.action.PERSONALIZATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.ConnectivityActivity" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.CONNECTIVITY" />
+                <action android:name="oversecured.ovaa.action.NEARBY_SHARE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -142,12 +142,12 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="redirect" android:scheme="ovaa" />
+                <data android:host="open" android:scheme="ovaa" />
             </intent-filter>
         </activity>
-        <receiver android:name=".receivers.VulnReceiver" android:exported="true" android:protectionLevel="dangerous">
+        <receiver android:name=".receivers.PromoCodeReceiver" android:exported="true" android:protectionLevel="dangerous">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.VULN_BROADCAST" />
+                <action android:name="oversecured.ovaa.action.PROMO_CODE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
@@ -157,11 +157,11 @@
         </receiver>
         <service android:name=".services.CredentialsService" android:exported="true">
             <intent-filter>
-                <action android:name="oversecured.ovaa.action.CREDENTIALS" />
+                <action android:name="oversecured.ovaa.action.ACCOUNT_SYNC" />
             </intent-filter>
         </service>
-        <provider android:name=".providers.LeakyProvider" android:authorities="oversecured.ovaa.leaky_provider" android:exported="true" android:grantUriPermissions="true" />
-        <provider android:name=".providers.TheftOverwriteProvider" android:authorities="oversecured.ovaa.theftoverwrite" android:exported="true" />
-        <provider android:name=".providers.CredentialsProvider" android:authorities="oversecured.ovaa.creds_provider" android:exported="false" android:grantUriPermissions="true" />
+        <provider android:name=".providers.SharedFilesProvider" android:authorities="oversecured.ovaa.shared_files" android:exported="true" android:grantUriPermissions="true" />
+        <provider android:name=".providers.SharedDocsProvider" android:authorities="oversecured.ovaa.shared_docs" android:exported="true" />
+        <provider android:name=".providers.CredentialsProvider" android:authorities="oversecured.ovaa.account" android:exported="false" android:grantUriPermissions="true" />
     </application>
 </manifest>

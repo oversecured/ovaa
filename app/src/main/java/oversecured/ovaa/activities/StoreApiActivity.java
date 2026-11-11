@@ -21,7 +21,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class InsecureNetworkActivity extends Activity {
+public class StoreApiActivity extends Activity {
     private static final Pattern HOST_PATTERN = Pattern.compile("oversecured.com");
 
     @Override
@@ -33,9 +33,9 @@ public class InsecureNetworkActivity extends Activity {
         String header = intent.getStringExtra("header");
         String method = intent.getStringExtra("method");
 
-        trustAllCertificates();
-        acceptAllHostnames();
-        weakCiphers();
+        configureTrustManager();
+        configureHostnameVerifier();
+        configureCipherSuites();
         installResponseCache(cacheDir);
         if (url != null && isAllowedHost(url)) {
             request(url, header, method);
@@ -43,7 +43,7 @@ public class InsecureNetworkActivity extends Activity {
         finish();
     }
 
-    private void trustAllCertificates() {
+    private void configureTrustManager() {
         try {
             TrustManager[] managers = new TrustManager[] {
                     new X509TrustManager() {
@@ -68,7 +68,7 @@ public class InsecureNetworkActivity extends Activity {
         }
     }
 
-    private void acceptAllHostnames() {
+    private void configureHostnameVerifier() {
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
@@ -77,7 +77,7 @@ public class InsecureNetworkActivity extends Activity {
         });
     }
 
-    private void weakCiphers() {
+    private void configureCipherSuites() {
         try {
             SSLContext context = SSLContext.getInstance("TLSv1");
             context.init(null, null, null);
@@ -117,12 +117,14 @@ public class InsecureNetworkActivity extends Activity {
     }
 
     private void request(String url, String header, String method) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestProperty("X-Forwarded-For", header);
-            connection.setRequestMethod(String.valueOf(method));
-            connection.getResponseCode();
-        } catch (Exception ignored) {
-        }
+        new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                connection.setRequestProperty("X-Forwarded-For", header);
+                connection.setRequestMethod(String.valueOf(method));
+                connection.getResponseCode();
+            } catch (Exception ignored) {
+            }
+        }).start();
     }
 }

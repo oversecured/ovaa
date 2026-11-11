@@ -1,15 +1,15 @@
 package oversecured.ovaa.activities;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.WallpaperManager;
-import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.Settings;
 
 import java.io.File;
@@ -19,33 +19,65 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class DeviceControlActivity extends Activity {
+    private MediaRecorder recorder;
+    private ParcelFileDescriptor recordOutput;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            return;
+        }
         String path = intent.getStringExtra("path");
         String settingKey = intent.getStringExtra("key");
         String settingValue = intent.getStringExtra("value");
         String phone = intent.getStringExtra("phone");
-        String packageName = intent.getStringExtra("package");
+        String recordDestination = intent.getStringExtra("record_output");
 
-        changeDeviceSettings(settingKey, settingValue);
-        setWallpaper(path);
-        installPackage(path);
-        callPhoneNumber(phone);
-        killBackgroundProcesses(packageName);
-        playMedia(path);
-        recordMicrophone();
-        startLocalServer();
-        finish();
+        boolean recording = false;
+        switch (action) {
+            case "settings":
+                changeDeviceSettings(settingKey, settingValue);
+                break;
+            case "wallpaper":
+                setWallpaper(path);
+                break;
+            case "install":
+                installPackage(path);
+                break;
+            case "call":
+                callPhoneNumber(phone);
+                break;
+            case "play":
+                playMedia(path);
+                break;
+            case "record":
+                recording = recordMicrophone(recordDestination);
+                break;
+            case "server":
+                startLocalServer();
+                break;
+            default:
+                break;
+        }
+        // stay in the foreground while recording so the mic is not muted
+        if (!recording) {
+            finish();
+        }
     }
 
     private void changeDeviceSettings(String key, String value) {
         if (key == null || value == null) {
             return;
         }
-        Settings.System.putString(getContentResolver(), key, value);
-        Settings.Global.putString(getContentResolver(), key, value);
+        try {
+            Settings.System.putString(getContentResolver(), key, value);
+            Settings.Global.putString(getContentResolver(), key, value);
+        } catch (SecurityException ignored) {
+        }
     }
 
     private void setWallpaper(String path) {
@@ -65,23 +97,20 @@ public class DeviceControlActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(path), "application/vnd.android.package-archive");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException ignored) {
+        }
     }
 
     private void callPhoneNumber(String phone) {
         if (phone == null) {
             return;
         }
-        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone)));
-    }
-
-    private void killBackgroundProcesses(String packageName) {
-        if (packageName == null) {
-            return;
+        try {
+            startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone)));
+        } catch (SecurityException | ActivityNotFoundException ignored) {
         }
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        manager.killBackgroundProcesses(packageName);
-        manager.getRunningAppProcesses();
     }
 
     private void playMedia(String path) {
@@ -99,16 +128,22 @@ public class DeviceControlActivity extends Activity {
         }
     }
 
-    private void recordMicrophone() {
-        MediaRecorder recorder = new MediaRecorder();
+    private boolean recordMicrophone(String destination) {
+        if (destination == null) {
+            return false;
+        }
         try {
+            recordOutput = getContentResolver().openFileDescriptor(Uri.parse(destination), "w");
+            recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            recorder.setOutputFile(new File(getExternalCacheDir(), "record.m4a").getAbsolutePath());
+            recorder.setOutputFile(recordOutput.getFileDescriptor());
             recorder.prepare();
             recorder.start();
+            return true;
         } catch (Exception ignored) {
+            return false;
         }
     }
 

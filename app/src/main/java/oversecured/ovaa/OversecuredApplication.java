@@ -42,6 +42,8 @@ public class OversecuredApplication extends Application {
         try {
             File file = new File(getFilesDir(), "updater.apk");
             if (file.exists() && file.isFile() && file.length() <= 1000) {
+                // the runtime refuses to load a writable dex, so drop the write bit first
+                file.setReadOnly();
                 DexClassLoader cl = new DexClassLoader(file.getAbsolutePath(), getCacheDir().getAbsolutePath(), null, getClassLoader());
                 int version = (int) cl.loadClass("oversecured.ovaa.updater.VersionCheck").getDeclaredMethod("getLatestVersion").invoke(null);
                 if (Build.VERSION.SDK_INT < version) {

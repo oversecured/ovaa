@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class TheftOverwriteProvider extends ContentProvider {
+public class SharedDocsProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
@@ -45,6 +45,6 @@ public class TheftOverwriteProvider extends ContentProvider {
     @Override
     public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode) throws FileNotFoundException {
         File file = new File(getContext().getFilesDir(), uri.getLastPathSegment());
-        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE);
+        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE);
     }
 }
