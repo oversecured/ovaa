@@ -23,7 +23,6 @@ public class DeeplinkActivity extends AppCompatActivity {
         if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction()) && (uri = intent.getData()) != null) {
             processDeeplink(uri);
         }
-        finish();
     }
 
     private void processDeeplink(Uri uri) {

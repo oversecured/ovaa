@@ -5,10 +5,10 @@ import android.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class WeakCrypto {
+public class TokenCipher {
     private static final String KEY = "49u5gh249gh24985ghf429gh4ch8f23f";
 
-    private WeakCrypto() {
+    private TokenCipher() {
     }
 
     public static String encrypt(String data) {

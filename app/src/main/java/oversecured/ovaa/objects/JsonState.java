@@ -6,16 +6,16 @@ import android.os.Parcelable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class MemoryCorruptionParcelable implements Parcelable {
-    public static final Parcelable.Creator<MemoryCorruptionParcelable> CREATOR = new Parcelable.Creator<>() {
+public class JsonState implements Parcelable {
+    public static final Parcelable.Creator<JsonState> CREATOR = new Parcelable.Creator<>() {
         @Override
-        public MemoryCorruptionParcelable[] newArray(int i) {
-            return new MemoryCorruptionParcelable[i];
+        public JsonState[] newArray(int i) {
+            return new JsonState[i];
         }
 
         @Override
-        public MemoryCorruptionParcelable createFromParcel(Parcel parcel) {
-            return new MemoryCorruptionParcelable(parcel);
+        public JsonState createFromParcel(Parcel parcel) {
+            return new JsonState(parcel);
         }
     };
 
@@ -23,7 +23,7 @@ public class MemoryCorruptionParcelable implements Parcelable {
 
     public Object data;
 
-    private MemoryCorruptionParcelable(Parcel parcel) {
+    private JsonState(Parcel parcel) {
         try {
             Class clazz = Class.forName(parcel.readString());
             data = GSON.fromJson(parcel.readString(), clazz);

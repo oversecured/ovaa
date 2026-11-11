@@ -9,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import oversecured.ovaa.R;
 
+/**
+ * Opens a promo or product page inside the store's in-app browser.
+ */
 public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
+        setTitle("Deals");
 
         WebView webView = findViewById(R.id.webview);
         setupWebView(webView);
